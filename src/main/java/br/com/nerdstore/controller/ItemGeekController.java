@@ -1,33 +1,43 @@
 package br.com.nerdstore.controller;
 
 import br.com.nerdstore.model.dto.ItemGeekRequestDTO;
-import br.com.nerdstore.model.dto.ItemGeekResponseDTO;
 import br.com.nerdstore.service.ItemGeekService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/item")
+@Tag(name = "Item Geek", description = "Endpoints para gerenciamento de itens geek")
 class ItemGeekController {
 
     @Autowired
     private ItemGeekService itemService;
 
-    @Operation(summary = "Listar todos os itens")
+    @Operation(summary = "Busca todos os itens cadastrados")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Itens encontrados com sucesso"),
+            @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
+    })
     @GetMapping
-    public ResponseEntity<List<ItemGeekResponseDTO>> getAllItems() {
+    public ResponseEntity<?> getAllItems() {
         try {
             return ResponseEntity.ok(itemService.buscarTodosOsItens());
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().build();
+            return ResponseEntity.status(500).body(e.getMessage());
         }
     }
 
-    @Operation(summary = "Buscar item pelo ID")
+    @Operation(summary = "Busca um item pelo id")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Item encontrado com sucesso"),
+            @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
+    })
     @GetMapping("/{id}")
     public ResponseEntity<?> getItemById(@PathVariable String id) {
         try {
@@ -37,33 +47,45 @@ class ItemGeekController {
         }
     }
 
-    @Operation(summary = "Postar um item")
+    @Operation(summary = "Posta um item à coleção")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Item criado com sucesso"),
+            @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
+    })
     @PostMapping
-    public ResponseEntity<ItemGeekResponseDTO> postItem(@RequestBody ItemGeekRequestDTO itemDTO) {
+    public ResponseEntity<?> postItem(@Valid @RequestBody ItemGeekRequestDTO itemDTO) {
         try {
             return ResponseEntity.ok(itemService.adicionarItem(itemDTO));
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().build();
+            return ResponseEntity.status(500).body(e.getMessage());
         }
     }
 
-    @Operation(summary = "Alterar um item")
+    @Operation(summary = "Atualiza um item")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Item atualizado com sucesso"),
+            @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
+    })
     @PutMapping("{id}")
-    public ResponseEntity<ItemGeekResponseDTO> putItem(@PathVariable String id, @RequestBody ItemGeekRequestDTO itemDTO) {
+    public ResponseEntity<?> putItem(@PathVariable String id,@Valid @RequestBody ItemGeekRequestDTO itemDTO) {
         try {
             return ResponseEntity.ok(itemService.atualizarItem(id, itemDTO));
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().build();
+            return ResponseEntity.status(500).body(e.getMessage());
         }
     }
 
-    @Operation(summary = "Deletar um item")
+    @Operation(summary = "Remove um item")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Item removido com sucesso"),
+            @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
+    })
     @DeleteMapping("{id}")
-    public ResponseEntity<ItemGeekResponseDTO> deleteItem(@PathVariable String id) {
+    public ResponseEntity<?> deleteItem(@PathVariable String id) {
         try {
             return ResponseEntity.ok(itemService.removerItem(id));
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().build();
+            return ResponseEntity.status(500).body(e.getMessage());
         }
     }
 
