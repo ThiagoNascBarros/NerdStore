@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -53,7 +54,17 @@ class ItemGeekController {
             @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     })
     @PostMapping
-    public ResponseEntity<?> postItem(@Valid @RequestBody ItemGeekRequestDTO itemDTO) {
+    public ResponseEntity<?> postItem(@RequestBody @Valid ItemGeekRequestDTO itemDTO, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            StringBuilder erros = new StringBuilder();
+            bindingResult.getFieldErrors().forEach(error ->
+                    erros.append(error.getField())
+                            .append(": ")
+                            .append(error.getDefaultMessage())
+                            .append("; ")
+            );
+            return ResponseEntity.badRequest().body(erros.toString());
+        }
         try {
             return ResponseEntity.ok(itemService.adicionarItem(itemDTO));
         } catch (Exception e) {
@@ -67,7 +78,7 @@ class ItemGeekController {
             @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     })
     @PutMapping("{id}")
-    public ResponseEntity<?> putItem(@PathVariable String id,@Valid @RequestBody ItemGeekRequestDTO itemDTO) {
+    public ResponseEntity<?> putItem(@PathVariable String id,@RequestBody @Valid ItemGeekRequestDTO itemDTO) {
         try {
             return ResponseEntity.ok(itemService.atualizarItem(id, itemDTO));
         } catch (Exception e) {
