@@ -1,0 +1,200 @@
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, FlatList, Image, ScrollView } from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
+import Logo from '../components/Logo';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import Feather from '@expo/vector-icons/Feather';
+import CardItem from '../components/CardItem';
+
+const filters = ['ACF', "HQ's", 'Roupa', 'Games'];
+
+export default function InicialScreen({ navigation }) {
+  const [search, setSearch] = useState('');
+  const [selectedFilter, setSelectedFilter] = useState(null);
+  const [selectedImage, setSelectedImage] = useState(null);
+
+  const pickImage = async () => {
+    // Solicita permissão para acessar a galeria
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    
+    if (status !== 'granted') {
+      alert('Desculpe, precisamos de permissão para acessar suas fotos!');
+      return;
+    }
+
+    // Abre o seletor de imagens
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setSelectedImage(result.assets[0].uri);
+      // Aqui você pode fazer o que quiser com a URI da imagem
+      console.log('URI da imagem selecionada:', result.assets[0].uri);
+    }
+  };
+
+  // Exemplo de dados simulando resposta da API
+  const items = [
+    {
+      id: '1',
+      name: 'Deadpool',
+      category: 'ActionFigure',
+      price: 129.90,
+      rating: 4,
+      imageUrl: 'https://i.imgur.com/0y8Ftya.png', // Substitua pela URL real da imagem
+    },
+    // Adicione mais itens conforme necessário
+  ];
+
+  return (
+    <ScrollView style={{ flex: 1, backgroundColor: '#fff' }} contentContainerStyle={{ alignItems: 'center', paddingBottom: 30 }}>
+      <Logo />
+
+      <View style={styles.searchContainer}>
+        <Feather
+          name="search"
+          size={20}
+          color="black"
+          style={styles.searchIcon}
+        />
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Pesquise seu item"
+          placeholderTextColor="black"
+          value={search}
+          onChangeText={setSearch}
+        />
+      </View>
+
+      
+      <View style={styles.filtersRow}>
+        {filters.map((filter, idx) => (
+          <TouchableOpacity
+            key={filter}
+            style={[styles.filterButton, selectedFilter === idx && styles.filterButtonSelected]}
+            onPress={() => setSelectedFilter(idx)}
+          >
+            <Text style={styles.filterText}>{filter}</Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+      <View style={styles.headerRow}>
+        <Text style={styles.title}>Seus itens</Text>
+        <TouchableOpacity style={styles.addButton} onPress={() => navigation.navigate('AdicionarItemScreen')}>
+          <Ionicons name="add-circle-outline" size={28} color="white" />
+        </TouchableOpacity>
+      </View>
+    </ScrollView>
+  );
+}
+
+const styles = StyleSheet.create({
+  searchContainer: {
+    width: '90%',
+    marginTop: 10,
+    marginBottom: 10,
+    position: 'relative',
+  },
+  searchIcon: {
+    position: 'absolute',
+    left: 16,
+    top: 18,
+    zIndex: 1,
+  },
+  searchInput: {
+    backgroundColor: '#E9DDFB',
+    borderRadius: 15,
+    paddingTop: 16,
+    paddingLeft: 45,
+    paddingBottom: 16,
+    
+    paddingRight: 26,
+    fontSize: 16,
+    color: '#000',
+  },
+  filtersRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 12,
+    marginVertical: 10,
+    flexWrap: 'wrap',
+  },
+  filterButton: {
+    backgroundColor: '#7B4AE2',
+    borderRadius: 20,
+    paddingHorizontal: 20,
+    paddingVertical: 8,
+    marginHorizontal: 4,
+    marginBottom: 6,
+  },
+  filterButtonSelected: {
+    backgroundColor: '#5938A5',
+  },
+  filterText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 15,
+  },
+  addButtonImage: {
+    width: 28,
+    height: 28,
+  },
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '90%',
+    justifyContent: 'space-between',
+    marginTop: 10,
+    marginBottom: 10,
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#000',
+  },
+  addButton: {
+    backgroundColor: '#7B4AE2',
+    borderRadius: 28,
+    width: 75,
+    height: 38,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  addButtonText: {
+    color: '#fff',
+    fontSize: 28,
+    fontWeight: 'bold',
+    marginTop: -2,
+  },
+  grid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    width: '95%',
+    marginTop: 10,
+  },
+  imagePickerButton: {
+    backgroundColor: '#7B4AE2',
+    borderRadius: 20,
+    paddingHorizontal: 20,
+    paddingVertical: 8,
+    marginTop: 10,
+    marginBottom: 10,
+  },
+  imagePickerText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 15,
+  },
+  selectedImage: {
+    width: 200,
+    height: 200,
+    borderRadius: 100,
+    marginTop: 10,
+    marginBottom: 10,
+  },
+});

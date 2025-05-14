@@ -1,0 +1,91 @@
+import React from 'react';
+import { View, Text, Image, StyleSheet } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+
+export default function CardItem({ name, category, price, rating, imageUrl }) {
+  return (
+    <View style={styles.card}>
+      <View style={styles.imageContainer}>
+        <Image source={{ uri: imageUrl }} style={styles.image} resizeMode="cover" />
+      </View>
+      <View style={styles.infoContainer}>
+        <Text style={styles.name}>{name}</Text>
+        <View style={styles.ratingRow}>
+          {[1,2,3,4,5].map((i) => (
+            <Ionicons
+              key={i}
+              name={i <= rating ? 'star' : 'star-outline'}
+              size={18}
+              color="#7B4AE2"
+              style={{ marginRight: 2 }}
+            />
+          ))}
+        </View>
+        <Text style={styles.category}>Categoria: {category}</Text>
+        <Text style={styles.price}>R$ {price.toFixed(2).replace('.', ',')}</Text>
+      </View>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  card: {
+    backgroundColor: '#E9DDFB',
+    borderRadius: 8,
+    padding: 0,
+    width: 180,
+    height: 240,
+    margin: 10,
+    alignItems: 'center',
+    shadowColor: '#7B4AE2',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 4,
+    overflow: 'hidden',
+  },
+  imageContainer: {
+    width: '100%',
+    height: 120,
+    backgroundColor: 'transparent',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  image: {
+    width: '100%',
+    height: '100%',
+    borderTopLeftRadius: 8,
+    borderTopRightRadius: 8,
+  },
+  infoContainer: {
+    flex: 1,
+    alignItems: 'flex-start',
+    width: '100%',
+    paddingHorizontal: 12,
+    paddingTop: 8,
+    paddingBottom: 6,
+    justifyContent: 'center',
+  },
+  name: {
+    fontWeight: 'bold',
+    fontSize: 18,
+    color: '#2D1B4E',
+    marginBottom: 2,
+  },
+  ratingRow: {
+    flexDirection: 'row',
+    marginBottom: 2,
+    gap: 8,
+  },
+  category: {
+    color: '#2D1B4E',
+    fontSize: 13,
+    marginBottom: 2,
+  },
+  price: {
+    color: '#7B4AE2',
+    fontWeight: 'bold',
+    fontSize: 16,
+    marginTop: 2,
+  },
+}); 
