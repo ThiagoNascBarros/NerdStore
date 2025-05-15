@@ -7,14 +7,17 @@ import {
   StyleSheet,
   ScrollView,
   Image,
-  KeyboardAvoidingView,
   Platform,
   Alert,
-  ActivityIndicator
+  ActivityIndicator,
+  Modal
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
-import { createItem } from '../services/api';
+import api from '../service/api';
+
+// Definindo as categorias disponíveis
+const CATEGORIAS = ['ACF', "HQ's", 'Games', 'Outros'];
 
 export default function AdicionarItemScreen({ navigation }) {
   const [name, setName] = useState('');
@@ -24,9 +27,9 @@ export default function AdicionarItemScreen({ navigation }) {
   const [rating, setRating] = useState(0);
   const [image, setImage] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [showCategoryModal, setShowCategoryModal] = useState(false);
 
   const handleChooseImage = async () => {
-    // Solicita permissão para acessar a galeria
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     
     if (status !== 'granted') {
@@ -34,12 +37,13 @@ export default function AdicionarItemScreen({ navigation }) {
       return;
     }
 
-    // Abre o seletor de imagens
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       aspect: [4, 3],
-      quality: 1,
+      quality: 0.5,
+      maxWidth: 800,
+      maxHeight: 800,
     });
 
     if (!result.canceled) {
@@ -55,25 +59,79 @@ export default function AdicionarItemScreen({ navigation }) {
 
     try {
       setLoading(true);
+
       const itemData = {
-        name,
-        category,
-        description,
-        price: parseFloat(price),
-        rating,
-        imageUrl: image, // Aqui você precisará implementar o upload da imagem para um servidor
+        nome: name,
+        categoria: category,
+        descricao: description,
+        preco: parseFloat(price),
+        classificacao: rating,
+        imagemUrl: image
       };
 
-      await createItem(itemData);
-      Alert.alert('Sucesso', 'Item adicionado com sucesso!');
-      navigation.goBack();
+      const response = await api.post('/item', itemData);
+
+      if (response.status === 200 || response.status === 201) {
+        Alert.alert('Sucesso', 'Item adicionado com sucesso!');
+        setName('');
+        setCategory('');
+        setDescription('');
+        setPrice('');
+        setRating(0);
+        setImage(null);
+        navigation.goBack();
+      }
     } catch (error) {
+      console.error('Erro ao adicionar item:', error);
       Alert.alert('Erro', 'Não foi possível adicionar o item. Tente novamente.');
-      console.error(error);
     } finally {
       setLoading(false);
     }
   };
+
+  const renderCategoryModal = () => (
+    <Modal
+      visible={showCategoryModal}
+      transparent={true}
+      animationType="fade"
+      onRequestClose={() => setShowCategoryModal(false)}
+    >
+      <TouchableOpacity
+        style={styles.modalOverlay}
+        activeOpacity={1}
+        onPress={() => setShowCategoryModal(false)}
+      >
+        <View style={styles.modalContent}>
+          <View style={styles.modalHeader}>
+            <Text style={styles.modalTitle}>Selecione uma categoria</Text>
+            <TouchableOpacity onPress={() => setShowCategoryModal(false)}>
+              <Ionicons name="close" size={24} color="#7B4AE2" />
+            </TouchableOpacity>
+          </View>
+          {CATEGORIAS.map((cat) => (
+            <TouchableOpacity
+              key={cat}
+              style={[
+                styles.categoryOption,
+                category === cat && styles.categoryOptionSelected
+              ]}
+              onPress={() => {
+                setCategory(cat);
+                setShowCategoryModal(false);
+              }}
+            >
+              <Text style={[
+                styles.categoryOptionText,
+                category === cat && styles.categoryOptionTextSelected
+              ]}>
+                {cat}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      </TouchableOpacity>
+    </Modal>
+  );
 
   if (loading) {
     return (
@@ -84,88 +142,89 @@ export default function AdicionarItemScreen({ navigation }) {
   }
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={{ flex: 1 }}
-      keyboardVerticalOffset={100}
+    <ScrollView
+      contentContainerStyle={styles.container}
+      keyboardShouldPersistTaps="handled"
     >
-      <ScrollView contentContainerStyle={styles.container}>
-        <TouchableOpacity style={styles.backButton} onPress={() => navigation?.goBack?.()}>
-          <Ionicons name="arrow-back" size={24} color="#fff" />
-        </TouchableOpacity>
+      <TouchableOpacity style={styles.backButton} onPress={() => navigation?.goBack?.()}>
+        <Ionicons name="arrow-back" size={24} color="#fff" />
+      </TouchableOpacity>
 
-        <Text style={styles.title}>Adicionar Item</Text>
+      <Text style={styles.title}>Adicionar Item</Text>
 
-        <Text style={styles.label}>Nome</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="adicione o nome do item"
-          placeholderTextColor="#BFA6E2"
-          value={name}
-          onChangeText={setName}
-        />
+      <Text style={styles.label}>Nome</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Ex: Camiseta Batman"
+        placeholderTextColor="#BFA6E2"
+        value={name}
+        onChangeText={setName}
+      />
 
-        <Text style={styles.label}>Categoria</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="adicione a sua categoria"
-          placeholderTextColor="#BFA6E2"
-          value={category}
-          onChangeText={setCategory}
-        />
+      <Text style={styles.label}>Categoria</Text>
+      <TouchableOpacity
+        style={styles.categorySelector}
+        onPress={() => setShowCategoryModal(true)}
+      >
+        <Text style={[styles.categorySelectorText, !category && styles.categorySelectorPlaceholder]}>
+          {category || 'Selecione uma categoria'}
+        </Text>
+        <Ionicons name="chevron-down" size={24} color="#7B4AE2" />
+      </TouchableOpacity>
 
-        <Text style={styles.label}>Descrição</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="adicione a descrição do item"
-          placeholderTextColor="#BFA6E2"
-          value={description}
-          onChangeText={setDescription}
-        />
+      {renderCategoryModal()}
 
-        <Text style={styles.label}>Preço</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Adicione preço do item"
-          placeholderTextColor="#BFA6E2"
-          value={price}
-          onChangeText={setPrice}
-          keyboardType="numeric"
-        />
+      <Text style={styles.label}>Descrição</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Ex: Produto novo, pouco uso"
+        placeholderTextColor="#BFA6E2"
+        value={description}
+        onChangeText={setDescription}
+      />
 
-        <Text style={styles.label}>Escolha sua imagem</Text>
-        <TouchableOpacity style={styles.imageButton} onPress={handleChooseImage}>
-          <Text style={styles.imageButtonText}>Clique e escolha sua imagem</Text>
-        </TouchableOpacity>
+      <Text style={styles.label}>Preço</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Ex: 49,90"
+        placeholderTextColor="#BFA6E2"
+        value={price}
+        onChangeText={setPrice}
+        keyboardType="numeric"
+      />
 
-        {image && (
-          <Image source={{ uri: image }} style={styles.previewImage} />
-        )}
+      <Text style={styles.label}>Escolha sua imagem</Text>
+      <TouchableOpacity style={styles.imageButton} onPress={handleChooseImage}>
+        <Text style={styles.imageButtonText}>Clique e escolha sua imagem</Text>
+      </TouchableOpacity>
 
-        <Text style={styles.label}>Classificação</Text>
-        <View style={styles.ratingRow}>
-          {[1, 2, 3, 4, 5].map((i) => (
-            <TouchableOpacity key={i} onPress={() => setRating(i)}>
-              <Ionicons
-                name={i <= rating ? 'star' : 'star-outline'}
-                size={32}
-                color="#7B4AE2"
-                style={{ marginHorizontal: 4 }}
-              />
-            </TouchableOpacity>
-          ))}
-        </View>
+      {image && (
+        <Image source={{ uri: image }} style={styles.previewImage} />
+      )}
 
-        <View style={styles.buttonRow}>
-          <TouchableOpacity style={styles.cancelButton} onPress={() => navigation?.goBack?.()}>
-            <Text style={styles.cancelButtonText}>Cancelar</Text>
+      <Text style={styles.label}>Classificação</Text>
+      <View style={styles.ratingRow}>
+        {[1, 2, 3, 4, 5].map((i) => (
+          <TouchableOpacity key={i} onPress={() => setRating(i)}>
+            <Ionicons
+              name={i <= rating ? 'star' : 'star-outline'}
+              size={32}
+              color="#7B4AE2"
+              style={{ marginHorizontal: 4 }}
+            />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-            <Text style={styles.saveButtonText}>Salvar</Text>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+        ))}
+      </View>
+
+      <View style={styles.buttonRow}>
+        <TouchableOpacity style={styles.cancelButton} onPress={() => navigation?.goBack?.()}>
+          <Text style={styles.cancelButtonText}>Cancelar</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
+          <Text style={styles.saveButtonText}>Salvar</Text>
+        </TouchableOpacity>
+      </View>
+    </ScrollView>
   );
 }
 
@@ -204,10 +263,12 @@ const styles = StyleSheet.create({
   input: {
     backgroundColor: '#E9DDFB',
     borderRadius: 15,
-    padding: 15,
+    paddingVertical: 12,
+    paddingHorizontal: 15,
     fontSize: 15,
     marginBottom: 5,
     color: '#222',
+    textAlignVertical: 'center',
   },
   imageButton: {
     backgroundColor: '#7B4AE2',
@@ -272,5 +333,64 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  categorySelector: {
+    backgroundColor: '#E9DDFB',
+    borderRadius: 15,
+    padding: 15,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  categorySelectorText: {
+    fontSize: 15,
+    color: '#222',
+  },
+  categorySelectorPlaceholder: {
+    color: '#BFA6E2',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    padding: 20,
+    width: '80%',
+    maxHeight: '80%',
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
+    paddingBottom: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E9DDFB',
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#7B4AE2',
+  },
+  categoryOption: {
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    borderRadius: 10,
+    marginBottom: 10,
+  },
+  categoryOptionSelected: {
+    backgroundColor: '#7B4AE2',
+  },
+  categoryOptionText: {
+    fontSize: 16,
+    color: '#222',
+  },
+  categoryOptionTextSelected: {
+    color: '#fff',
   },
 });

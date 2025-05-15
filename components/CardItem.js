@@ -2,7 +2,10 @@ import React from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
-export default function CardItem({ name, category, price, rating, imageUrl }) {
+export default function CardItem({ item }) {
+  if (!item) return null;
+  const { name, category, price, rating, imageUrl } = item;
+  console.log('imageUrl:', imageUrl);
   return (
     <View style={styles.card}>
       <View style={styles.imageContainer}>
@@ -22,7 +25,9 @@ export default function CardItem({ name, category, price, rating, imageUrl }) {
           ))}
         </View>
         <Text style={styles.category}>Categoria: {category}</Text>
-        <Text style={styles.price}>R$ {price.toFixed(2).replace('.', ',')}</Text>
+        <View style={styles.footer}>
+          <Text style={styles.price}>R$ {price ? Number(price).toFixed(2) : '0.00'}</Text>
+        </View>
       </View>
     </View>
   );
@@ -37,16 +42,13 @@ const styles = StyleSheet.create({
     height: 240,
     margin: 10,
     alignItems: 'center',
-    shadowColor: '#7B4AE2',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
-    elevation: 4,
     overflow: 'hidden',
   },
   imageContainer: {
     width: '100%',
     height: 120,
+    padding: 8,
+    borderRadius: 8,
     backgroundColor: 'transparent',
     justifyContent: 'center',
     alignItems: 'center',
@@ -60,6 +62,7 @@ const styles = StyleSheet.create({
   infoContainer: {
     flex: 1,
     alignItems: 'flex-start',
+    gap: 8,
     width: '100%',
     paddingHorizontal: 12,
     paddingTop: 8,
@@ -80,12 +83,13 @@ const styles = StyleSheet.create({
   category: {
     color: '#2D1B4E',
     fontSize: 13,
-    marginBottom: 2,
+    marginBottom: 0,
   },
   price: {
     color: '#7B4AE2',
     fontWeight: 'bold',
     fontSize: 16,
-    marginTop: 2,
+    marginRight: 70,
+    marginBottom: 15,
   },
 }); 
