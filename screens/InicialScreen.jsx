@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, FlatList, Image } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import Logo from '../components/Logo';
@@ -6,6 +6,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import Feather from '@expo/vector-icons/Feather';
 import api from '../service/api';
 import CardItem from '../components/CardItem';
+import { useFocusEffect } from '@react-navigation/native';
 
 // Definindo as categorias disponíveis
 const CATEGORIAS = ['ACF', "HQ's", 'Games', 'Outros'];
@@ -17,30 +18,23 @@ export default function InicialScreen({ navigation }) {
   const [items, setItems] = useState([]);
   const [filteredItems, setFilteredItems] = useState([]);
 
-  // Função para buscar os itens
-  const fetchItems = useCallback(() => {
-    api.get("/item")
-      .then(response => {
-        const adaptedItems = adaptItems(response.data);
-        setItems(adaptedItems);
-        setFilteredItems(adaptedItems);
-      })
-      .catch(error => console.error(error));
-  }, []);
+  const loadItems = async () => {
+    try {
+      const response = await api.get("/item");
+      const adaptedItems = adaptItems(response.data);
+      setItems(adaptedItems);
+      setFilteredItems(adaptedItems);
+    } catch (error) {
+      console.error('Erro ao carregar itens:', error);
+    }
+  };
 
-  // Chama ao montar a tela
-  useEffect(() => {
-    fetchItems();
-  }, [fetchItems]);
-
-  // Atualiza sempre que a tela for focada
-  useEffect(() => {
-    const unsubscribe = navigation.addListener('focus', () => {
-      fetchItems();
-      setSelectedFilter(null);
-    });
-    return unsubscribe;
-  }, [navigation, fetchItems]);
+  // Carrega os itens quando a tela recebe foco
+  useFocusEffect(
+    React.useCallback(() => {
+      loadItems();
+    }, [])
+  );
 
   // Efeito para filtrar os itens quando o filtro ou a busca mudar
   useEffect(() => {
@@ -198,7 +192,7 @@ const styles = StyleSheet.create({
   },
   filterText: {
     color: '#fff',
-    fontWeight: 'bold',
+    fontWeight: 'semibold',
     fontSize: 12,
   },
   addButtonImage: {

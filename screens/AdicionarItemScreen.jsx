@@ -30,24 +30,29 @@ export default function AdicionarItemScreen({ navigation }) {
   const [showCategoryModal, setShowCategoryModal] = useState(false);
 
   const handleChooseImage = async () => {
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    
-    if (status !== 'granted') {
-      Alert.alert('Permissão necessária', 'Precisamos de permissão para acessar suas fotos!');
-      return;
-    }
+    try {
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      
+      if (status !== 'granted') {
+        Alert.alert('Permissão necessária', 'Precisamos de permissão para acessar suas fotos!');
+        return;
+      }
 
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 0.5,
-      maxWidth: 800,
-      maxHeight: 800,
-    });
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 0.5,
+        maxWidth: 800,
+        maxHeight: 800,
+      });
 
-    if (!result.canceled) {
-      setImage(result.assets[0].uri);
+      if (!result.canceled && result.assets && result.assets[0]) {
+        setImage(result.assets[0].uri);
+      }
+    } catch (error) {
+      console.error('Erro ao selecionar imagem:', error);
+      Alert.alert('Erro', 'Não foi possível selecionar a imagem. Tente novamente.');
     }
   };
 
@@ -69,6 +74,8 @@ export default function AdicionarItemScreen({ navigation }) {
         imagemUrl: image
       };
 
+      console.log('Dados sendo enviados:', itemData);
+
       const response = await api.post('/item', itemData);
 
       if (response.status === 200 || response.status === 201) {
@@ -82,8 +89,11 @@ export default function AdicionarItemScreen({ navigation }) {
         navigation.goBack();
       }
     } catch (error) {
-      console.error('Erro ao adicionar item:', error);
-      Alert.alert('Erro', 'Não foi possível adicionar o item. Tente novamente.');
+      console.error('Erro ao adicionar item:', error.response?.data || error);
+      Alert.alert(
+        'Erro',
+        `Não foi possível adicionar o item. ${error.response?.data?.message || 'Verifique se todos os campos estão preenchidos corretamente.'}`
+      );
     } finally {
       setLoading(false);
     }
@@ -337,7 +347,8 @@ const styles = StyleSheet.create({
   categorySelector: {
     backgroundColor: '#E9DDFB',
     borderRadius: 15,
-    padding: 15,
+    paddingVertical: 12,
+    paddingHorizontal: 15,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',

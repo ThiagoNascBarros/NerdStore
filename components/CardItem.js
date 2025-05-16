@@ -1,35 +1,41 @@
 import React from 'react';
-import { View, Text, Image, StyleSheet } from 'react-native';
+import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 
 export default function CardItem({ item }) {
   if (!item) return null;
+
+  const navigation = useNavigation();
   const { name, category, price, rating, imageUrl } = item;
   console.log('imageUrl:', imageUrl);
+
   return (
-    <View style={styles.card}>
-      <View style={styles.imageContainer}>
-        <Image source={{ uri: imageUrl }} style={styles.image} resizeMode="cover" />
-      </View>
-      <View style={styles.infoContainer}>
-        <Text style={styles.name}>{name}</Text>
-        <View style={styles.ratingRow}>
-          {[1,2,3,4,5].map((i) => (
-            <Ionicons
-              key={i}
-              name={i <= rating ? 'star' : 'star-outline'}
-              size={18}
-              color="#7B4AE2"
-              style={{ marginRight: 2 }}
-            />
-          ))}
+    <TouchableOpacity onPress={() => navigation.navigate('VisualizarItemScreen', { item })} activeOpacity={0.85}>
+      <View style={styles.card}>
+        <View style={styles.imageContainer}>
+          <Image source={{ uri: imageUrl }} style={styles.image} resizeMode="cover" />
         </View>
-        <Text style={styles.category}>Categoria: {category}</Text>
-        <View style={styles.footer}>
-          <Text style={styles.price}>R$ {price ? Number(price).toFixed(2) : '0.00'}</Text>
+        <View style={styles.infoContainer}>
+          <Text style={styles.name}>{name}</Text>
+          <View style={styles.ratingRow}>
+            {[1, 2, 3, 4, 5].map((i) => (
+              <Ionicons
+                key={i}
+                name={i <= rating ? 'star' : 'star-outline'}
+                size={18}
+                color="#7B4AE2"
+                style={{ marginRight: 2 }}
+              />
+            ))}
+          </View>
+          <Text style={styles.category}>Categoria: {category}</Text>
+          <View style={styles.footer}>
+            <Text style={styles.price}>R$ {price ? Number(price).toFixed(2) : '0.00'}</Text>
+          </View>
         </View>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 }
 
@@ -78,7 +84,6 @@ const styles = StyleSheet.create({
   ratingRow: {
     flexDirection: 'row',
     marginBottom: 2,
-    gap: 8,
   },
   category: {
     color: '#2D1B4E',
@@ -89,7 +94,10 @@ const styles = StyleSheet.create({
     color: '#7B4AE2',
     fontWeight: 'bold',
     fontSize: 16,
-    marginRight: 70,
     marginBottom: 15,
   },
-}); 
+  footer: {
+    width: '100%',
+    alignItems: 'flex-start',
+  },
+});
