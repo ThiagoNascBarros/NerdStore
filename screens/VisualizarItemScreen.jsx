@@ -1,72 +1,80 @@
-import React from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, Image, StyleSheet, TouchableOpacity, Alert, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import api from '../service/api';
+import DeleteModal from '../components/DeleteModal';
 
 export default function VisualizarItemScreen({ route, navigation }) {
   const { item } = route.params;
+  const [modalVisible, setModalVisible] = useState(false);
 
-  const handleDelete = async () => {
-    Alert.alert(
-      'Excluir Item',
-      'Tem certeza que deseja excluir este item?',
-      [
-        { text: 'Cancelar', style: 'cancel' },
-        {
-          text: 'Excluir',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await api.delete(`/item/${item.id}`);
-              Alert.alert('Sucesso', 'Item excluído com sucesso!');
-              navigation.goBack();
-            } catch (error) {
-              Alert.alert('Erro', 'Não foi possível excluir o item.');
-            }
-          },
-        },
-      ]
-    );
+  const handleDeleteConfirm = async () => {
+    try {
+      await api.delete(`/item/${item.id}`);
+      Alert.alert('Sucesso', 'Item excluído com sucesso!');
+      setModalVisible(false);
+      navigation.goBack();
+    } catch (error) {
+      Alert.alert('Erro', 'Não foi possível excluir o item.');
+    }
   };
 
   const handleEdit = () => {
-    navigation.navigate('AdicionarItemScreen', { item });
+    const adaptedItem = {
+      id: item.id,
+      name: item.name || item.nome,
+      category: item.category || item.categoria,
+      price: item.price || item.preco,
+      rating: item.rating || item.classificacao,
+      imageUrl: item.imageUrl || item.imagemUrl,
+      description: item.description || item.descricao,
+    };
+    navigation.navigate('EditarItemScreen', { item: adaptedItem });
   };
 
   return (
     <View style={styles.container}>
-      <View style={styles.card}>
-        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-          <Ionicons name="arrow-back" size={28} color="#7B4AE2" />
-        </TouchableOpacity>
-        <Image source={{ uri: item.imageUrl }} style={styles.image} resizeMode="cover" />
+      <Image source={{ uri: item.imageUrl }} style={styles.image} resizeMode="cover" />
+      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+        <Ionicons name="arrow-back" size={28} color="#fff" />
+      </TouchableOpacity>
+      <ScrollView style={styles.scrollContainer}>
         <View style={styles.infoContainer}>
-          <Text style={styles.name}>{item.name}</Text>
-          <View style={styles.ratingRow}>
-            {[1, 2, 3, 4, 5].map((i) => (
-              <Ionicons
-                key={i}
-                name={i <= item.rating ? 'star' : 'star-outline'}
-                size={22}
-                color="#7B4AE2"
-                style={{ marginRight: 2 }}
-              />
-            ))}
+          <View style={styles.categoryContainer}>
+            <View style={styles.nameContainer}>
+              <Text style={styles.name}>{item.name}</Text>
+              <View style={styles.ratingRow}>
+                {[1, 2, 3, 4, 5].map((i) => (
+                  <Ionicons
+                    key={i}
+                    name={i <= item.rating ? 'star' : 'star-outline'}
+                    size={22}
+                    color="#7B4AE2"
+                    style={{ marginRight: 16 }}
+                  />
+                ))}
+              </View>
+              <Text style={styles.category}>Categoria: {item.category}</Text>
+              <Text style={styles.price}>R$ {item.price ? Number(item.price).toFixed(2) : '0.00'}</Text>
+              <Text style={styles.description}>Descrição: {item.description}</Text>
+            </View>
           </View>
-          <Text style={styles.category}>Categoria: {item.category}</Text>
-          <Text style={styles.price}>R$ {item.price ? Number(item.price).toFixed(2) : '0.00'}</Text>
-          <Text style={styles.descriptionTitle}>Descrição:</Text>
-          <Text style={styles.description}>{item.description}</Text>
         </View>
-        <View style={styles.buttonRow}>
-          <TouchableOpacity style={styles.deleteButton} onPress={handleDelete}>
-            <Ionicons name="trash" size={28} color="#fff" />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.editButton} onPress={handleEdit}>
-            <Ionicons name="pencil" size={28} color="#fff" />
-          </TouchableOpacity>
-        </View>
+      </ScrollView>
+      <View style={styles.buttons}>
+        <TouchableOpacity style={styles.deleteButton} onPress={() => setModalVisible(true)}>
+          <Ionicons name="trash" size={29} color="#fff" />
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.editButton} onPress={handleEdit}>
+          <Ionicons name="pencil" size={28} color="#fff" />
+        </TouchableOpacity>
       </View>
+      
+      <DeleteModal
+        visible={modalVisible}
+        onClose={() => setModalVisible(false)}
+        onConfirm={handleDeleteConfirm}
+      />
     </View>
   );
 }
@@ -74,101 +82,93 @@ export default function VisualizarItemScreen({ route, navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#E9DDFB',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  card: {
     backgroundColor: '#fff',
-    borderRadius: 20,
-    width: 320,
-    paddingBottom: 20,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
-    margin: 10,
+  },
+  scrollContainer: {
+    flex: 1,
+    marginTop: 30,
+  },
+  nameContainer: {
+    gap: 16,
+    marginTop: 0,
   },
   backButton: {
     position: 'absolute',
-    top: 18,
-    left: 18,
+    top: 55,
+    left: 16,
     zIndex: 2,
-    backgroundColor: '#fff',
-    borderRadius: 20,
-    padding: 4,
-    elevation: 2,
+    backgroundColor: '#5938A5',
+    borderRadius: 50,
+    padding: 12,
   },
   image: {
     width: '100%',
-    height: 180,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
+    height: 400,
   },
   infoContainer: {
-    width: '100%',
-    paddingHorizontal: 18,
-    paddingTop: 16,
-    alignItems: 'flex-start',
+    width: '90%',
+    paddingHorizontal: 0,
+    paddingVertical: 0,
+    alignSelf: 'center',
+  },
+  buttons: {
+    flexDirection: 'row',
+    width: '90%',
+    gap: 215,
+    paddingVertical: 40,
+    alignSelf: 'center',
+    backgroundColor: '#fff',
   },
   name: {
     fontWeight: 'bold',
-    fontSize: 22,
-    color: '#2D1B4E',
-    marginBottom: 4,
+    fontSize: 27,
+    color: '#000',
+    marginBottom: 14,
   },
   ratingRow: {
     flexDirection: 'row',
-    marginBottom: 6,
+    marginBottom: 16,
   },
   category: {
-    color: '#2D1B4E',
-    fontSize: 15,
-    marginBottom: 4,
+    color: '#000',
+    fontSize: 20,
+    marginBottom: 1,
+    fontWeight: 500,
   },
   price: {
-    color: '#7B4AE2',
+    color: '#5938A5',
     fontWeight: 'bold',
-    fontSize: 18,
-    marginBottom: 8,
+    fontSize: 20.23,
+
   },
-  descriptionTitle: {
-    fontWeight: 'bold',
-    color: '#2D1B4E',
-    marginTop: 6,
-    marginBottom: 2,
+  categoryContainer: {
+    marginTop: 0,
   },
   description: {
-    color: '#222',
-    fontSize: 14,
-    marginBottom: 8,
+    color: '#000',
+    fontSize: 16,
+    fontWeight: 'medium',
   },
   buttonRow: {
-    flexDirection: 'row',
+    flexDirection: 'colunm',
     justifyContent: 'space-between',
-    width: '80%',
-    marginTop: 18,
-    alignSelf: 'center',
-    gap: 30,
+    width: '100%',
+    gap: 8,
   },
   deleteButton: {
-    backgroundColor: '#7B4AE2',
-    borderRadius: 10,
-    padding: 12,
+    backgroundColor: '#5938A5',
+    borderRadius: 16,
+    width: 73,
+    height: 56,
     alignItems: 'center',
     justifyContent: 'center',
-    flex: 1,
-    marginRight: 10,
   },
   editButton: {
-    backgroundColor: '#7B4AE2',
-    borderRadius: 10,
-    padding: 12,
+    backgroundColor: '#5938A5',
+    borderRadius: 18,
+    width: 73,
+    height: 56,
     alignItems: 'center',
     justifyContent: 'center',
-    flex: 1,
-    marginLeft: 10,
   },
 });

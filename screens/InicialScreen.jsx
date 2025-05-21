@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, FlatList, Image } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import Logo from '../components/Logo';
@@ -92,8 +92,7 @@ export default function InicialScreen({ navigation }) {
     }
   };
 
-  // Header para o FlatList
-  const renderHeader = () => (
+  const renderHeader = useMemo(() => (
     <>
       <Logo />
       <View style={[styles.searchContainer, { width: '90%', alignSelf: 'center' }]}>
@@ -108,7 +107,11 @@ export default function InicialScreen({ navigation }) {
           placeholder="Pesquise seu item"
           placeholderTextColor="black"
           value={search}
-          onChangeText={setSearch}
+          onChangeText={setSearch} // Atualiza o estado corretamente
+          autoCorrect={false} // Desativa a correção automática
+          keyboardType="default" // Define o tipo de teclado
+          returnKeyType="search" // Adiciona um botão de busca no teclado
+          blurOnSubmit={false} // Evita que o teclado feche ao pressionar "Enter"
         />
       </View>
       <View style={[styles.filtersRow, { width: '97.9%', alignSelf: 'center' }]}>
@@ -129,7 +132,7 @@ export default function InicialScreen({ navigation }) {
         </TouchableOpacity>
       </View>
     </>
-  );
+  ), [search, selectedFilter]);
 
   return (
     <View style={{ flex: 1, backgroundColor: '#fff' }}>
@@ -142,6 +145,7 @@ export default function InicialScreen({ navigation }) {
         contentContainerStyle={{ paddingBottom: 30, paddingTop: 10 }}
         showsVerticalScrollIndicator={false}
         ListHeaderComponent={renderHeader}
+        keyboardShouldPersistTaps="handled" // Evita que o teclado feche ao tocar na lista
       />
     </View>
   );
@@ -157,7 +161,7 @@ const styles = StyleSheet.create({
   searchIcon: {
     position: 'absolute',
     left: 16,
-    top: 18,
+    top: 15.5,
     zIndex: 1,
   },
   searchInput: {
@@ -167,7 +171,7 @@ const styles = StyleSheet.create({
     paddingLeft: 45,
     paddingBottom: 16,
     paddingRight: 26,
-    fontSize: 16,
+    fontSize: 12,
     color: '#000',
   },
   filtersRow: {
@@ -192,7 +196,7 @@ const styles = StyleSheet.create({
   },
   filterText: {
     color: '#fff',
-    fontWeight: 'semibold',
+    fontWeight: 500,
     fontSize: 12,
   },
   addButtonImage: {

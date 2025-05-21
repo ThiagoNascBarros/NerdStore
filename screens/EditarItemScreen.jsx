@@ -7,37 +7,34 @@ import {
   StyleSheet,
   ScrollView,
   Image,
-  Platform,
   Alert,
   ActivityIndicator,
-  Modal
+  Modal,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import api from '../service/api';
 
-// Definindo as categorias disponíveis
 const CATEGORIAS = ['ACF', "HQ's", 'Games', 'Outros'];
 
-export default function AdicionarItemScreen({ navigation }) {
-  const [name, setName] = useState('');
-  const [category, setCategory] = useState('');
-  const [description, setDescription] = useState('');
-  const [price, setPrice] = useState('');
-  const [rating, setRating] = useState(0);
-  const [image, setImage] = useState(null);
+export default function EditarItemScreen({ route, navigation }) {
+  const { item } = route.params;
+  const [name, setName] = useState(item?.name || '');
+  const [category, setCategory] = useState(item?.category || '');
+  const [description, setDescription] = useState(item?.description || '');
+  const [price, setPrice] = useState(item?.price ? String(item.price) : '');
+  const [rating, setRating] = useState(item?.rating || 0);
+  const [image, setImage] = useState(item?.imageUrl || null);
   const [loading, setLoading] = useState(false);
   const [showCategoryModal, setShowCategoryModal] = useState(false);
 
   const handleChooseImage = async () => {
     try {
       const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      
       if (status !== 'granted') {
         Alert.alert('Permissão necessária', 'Precisamos de permissão para acessar suas fotos!');
         return;
       }
-
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: true,
@@ -46,7 +43,6 @@ export default function AdicionarItemScreen({ navigation }) {
         maxWidth: 800,
         maxHeight: 800,
       });
-
       if (!result.canceled && result.assets && result.assets[0]) {
         setImage(result.assets[0].uri);
       }
@@ -61,39 +57,23 @@ export default function AdicionarItemScreen({ navigation }) {
       Alert.alert('Campos obrigatórios', 'Por favor, preencha todos os campos e selecione uma imagem.');
       return;
     }
-
     try {
       setLoading(true);
-
       const itemData = {
         nome: name,
         categoria: category,
         descricao: description,
         preco: parseFloat(price),
         classificacao: rating,
-        imagemUrl: image
+        imagemUrl: image,
       };
-
-      console.log('Enviando para API:', JSON.stringify(itemData, null, 2));
-
-      const response = await api.post('/item', itemData);
-
-      if (response.status === 200 || response.status === 201) {
-        Alert.alert('Sucesso', 'Item adicionado com sucesso!');
-        setName('');
-        setCategory('');
-        setDescription('');
-        setPrice('');
-        setRating(0);
-        setImage(null);
-        navigation.goBack();
-      }
+      console.log('Enviando para API:', itemData);
+      await api.put(`/item/${item.id}`, itemData);
+      Alert.alert('Sucesso', 'Item atualizado com sucesso!');
+      navigation.goBack();
     } catch (error) {
-      console.error('Erro ao adicionar item:', error.response?.data || error);
-      Alert.alert(
-        'Erro',
-        `Não foi possível adicionar o item. ${error.response?.data?.message || 'Verifique se todos os campos estão preenchidos corretamente.'}`
-      );
+      console.error('Erro ao atualizar item:', error.response?.data || error);
+      Alert.alert('Erro', `Não foi possível atualizar o item.\n${error.response?.data?.message || error.message}`);
     } finally {
       setLoading(false);
     }
@@ -152,25 +132,19 @@ export default function AdicionarItemScreen({ navigation }) {
   }
 
   return (
-    <ScrollView
-      contentContainerStyle={styles.container}
-      keyboardShouldPersistTaps="handled"
-    >
-      <TouchableOpacity style={styles.backButton} onPress={() => navigation?.goBack?.()}>
-        <Ionicons name="arrow-back" size={24} color="#fff" />
+    <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
+      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+        <Ionicons name="arrow-back" size={24} color="#FFF" />
       </TouchableOpacity>
-
-      <Text style={styles.title}>Adicionar Item</Text>
-
+      <Text style={styles.title}>Editar Item</Text>
       <Text style={styles.label}>Nome</Text>
       <TextInput
         style={styles.input}
-        placeholder="Ex: Camiseta Batman"
+        placeholder="adicione o nome do item"
         placeholderTextColor="#BFA6E2"
         value={name}
         onChangeText={setName}
       />
-
       <Text style={styles.label}>Categoria</Text>
       <TouchableOpacity
         style={styles.categorySelector}
@@ -181,37 +155,31 @@ export default function AdicionarItemScreen({ navigation }) {
         </Text>
         <Ionicons name="chevron-down" size={24} color="#7B4AE2" />
       </TouchableOpacity>
-
       {renderCategoryModal()}
-
       <Text style={styles.label}>Descrição</Text>
       <TextInput
         style={styles.input}
-        placeholder="Ex: Produto novo, pouco uso"
+        placeholder="adicione a descrição do item"
         placeholderTextColor="#BFA6E2"
         value={description}
         onChangeText={setDescription}
       />
-
       <Text style={styles.label}>Preço</Text>
       <TextInput
         style={styles.input}
-        placeholder="Ex: 49,90"
+        placeholder="Adicione preço do item"
         placeholderTextColor="#BFA6E2"
         value={price}
         onChangeText={setPrice}
         keyboardType="numeric"
       />
-
       <Text style={styles.label}>Escolha sua imagem</Text>
       <TouchableOpacity style={styles.imageButton} onPress={handleChooseImage}>
         <Text style={styles.imageButtonText}>Clique e escolha sua imagem</Text>
       </TouchableOpacity>
-
       {image && (
         <Image source={{ uri: image }} style={styles.previewImage} />
       )}
-
       <Text style={styles.label}>Classificação</Text>
       <View style={styles.ratingRow}>
         {[1, 2, 3, 4, 5].map((i) => (
@@ -225,9 +193,8 @@ export default function AdicionarItemScreen({ navigation }) {
           </TouchableOpacity>
         ))}
       </View>
-
       <View style={styles.buttonRow}>
-        <TouchableOpacity style={styles.cancelButton} onPress={() => navigation?.goBack?.()}>
+        <TouchableOpacity style={styles.cancelButton} onPress={() => navigation.goBack()}>
           <Text style={styles.cancelButtonText}>Cancelar</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
@@ -245,23 +212,20 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
   },
   backButton: {
-    backgroundColor: '#7B4AE2',
-    borderRadius: 50,
-    width: 40,
-    height: 40,
-    alignItems: 'center',
-    justifyContent: 'center',
     position: 'absolute',
-    left: 19,
-    top: 65,
+    top: 55,
+    left: 16,
     zIndex: 2,
+    backgroundColor: '#5938A5',
+    borderRadius: 50,
+    padding: 12,
   },
   title: {
     fontSize: 22,
     fontWeight: 'bold',
     color: '#7B4AE2',
     textAlign: 'center',
-    marginVertical: 50,
+    marginVertical: 45,
   },
   label: {
     fontWeight: 'bold',
