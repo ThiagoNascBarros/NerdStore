@@ -182,7 +182,7 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
   },
   filterButton: {
-    backgroundColor: '#7B4AE2',
+    backgroundColor: '#5938A5',
     borderRadius: 20,
     width: 75,
     height: 32,
@@ -217,7 +217,7 @@ const styles = StyleSheet.create({
     color: '#000',
   },
   addButton: {
-    backgroundColor: '#7B4AE2',
+    backgroundColor: '#5938A5',
     borderRadius: 28,
     width: 75,
     height: 38,
@@ -238,7 +238,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   imagePickerButton: {
-    backgroundColor: '#7B4AE2',
+    backgroundColor: '#5938A5',
     borderRadius: 20,
     paddingHorizontal: 20,
     paddingVertical: 8,

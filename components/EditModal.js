@@ -2,16 +2,16 @@ import React from 'react';
 import { Modal, View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
-export default function DeleteModal({ visible, onCancel, onConfirm }) {
+export default function EditModal({ visible, onCancel, onConfirm }) {
   return (
     <Modal visible={visible} transparent animationType="fade">
       <View style={styles.overlay}>
         <View style={styles.modalContainer}>
-        <Ionicons name="trash" size={80} color="#5938A5" />
-          <Text style={styles.title}>Tem certeza que deseja{'\n'}excluir esse item?</Text>
+        <Ionicons name="pencil" size={80} color="#5938A5" />
+          <Text style={styles.title}>Tem certeza que deseja{'\n'}editar esse item?</Text>
 
           <TouchableOpacity style={styles.confirmButton} onPress={onConfirm}>
-            <Text style={styles.confirmText}>Excluir</Text>
+            <Text style={styles.confirmText}>Editar</Text>
           </TouchableOpacity>
 
           <TouchableOpacity onPress={onCancel}>

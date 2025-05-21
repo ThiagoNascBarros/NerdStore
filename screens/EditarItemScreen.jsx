@@ -14,6 +14,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import api from '../service/api';
+import EditModal from '../components/EditModal';
 
 const CATEGORIAS = ['ACF', "HQ's", 'Games', 'Outros'];
 
@@ -27,6 +28,7 @@ export default function EditarItemScreen({ route, navigation }) {
   const [image, setImage] = useState(item?.imageUrl || null);
   const [loading, setLoading] = useState(false);
   const [showCategoryModal, setShowCategoryModal] = useState(false);
+  const [editModalVisible, setEditModalVisible] = useState(false);
 
   const handleChooseImage = async () => {
     try {
@@ -57,6 +59,10 @@ export default function EditarItemScreen({ route, navigation }) {
       Alert.alert('Campos obrigatórios', 'Por favor, preencha todos os campos e selecione uma imagem.');
       return;
     }
+    setEditModalVisible(true);
+  };
+
+  const handleEditConfirm = async () => {
     try {
       setLoading(true);
       const itemData = {
@@ -70,6 +76,7 @@ export default function EditarItemScreen({ route, navigation }) {
       console.log('Enviando para API:', itemData);
       await api.put(`/item/${item.id}`, itemData);
       Alert.alert('Sucesso', 'Item atualizado com sucesso!');
+      setEditModalVisible(false);
       navigation.goBack();
     } catch (error) {
       console.error('Erro ao atualizar item:', error.response?.data || error);
@@ -95,7 +102,7 @@ export default function EditarItemScreen({ route, navigation }) {
           <View style={styles.modalHeader}>
             <Text style={styles.modalTitle}>Selecione uma categoria</Text>
             <TouchableOpacity onPress={() => setShowCategoryModal(false)}>
-              <Ionicons name="close" size={24} color="#7B4AE2" />
+              <Ionicons name="close" size={24} color="#5938A5" />
             </TouchableOpacity>
           </View>
           {CATEGORIAS.map((cat) => (
@@ -126,7 +133,7 @@ export default function EditarItemScreen({ route, navigation }) {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#7B4AE2" />
+        <ActivityIndicator size="large" color="#5938A5" />
       </View>
     );
   }
@@ -153,7 +160,7 @@ export default function EditarItemScreen({ route, navigation }) {
         <Text style={[styles.categorySelectorText, !category && styles.categorySelectorPlaceholder]}>
           {category || 'Selecione uma categoria'}
         </Text>
-        <Ionicons name="chevron-down" size={24} color="#7B4AE2" />
+        <Ionicons name="chevron-down" size={24} color="#5938A5" />
       </TouchableOpacity>
       {renderCategoryModal()}
       <Text style={styles.label}>Descrição</Text>
@@ -187,7 +194,7 @@ export default function EditarItemScreen({ route, navigation }) {
             <Ionicons
               name={i <= rating ? 'star' : 'star-outline'}
               size={32}
-              color="#7B4AE2"
+              color="#5938A5"
               style={{ marginHorizontal: 4 }}
             />
           </TouchableOpacity>
@@ -201,6 +208,11 @@ export default function EditarItemScreen({ route, navigation }) {
           <Text style={styles.saveButtonText}>Salvar</Text>
         </TouchableOpacity>
       </View>
+      <EditModal
+        visible={editModalVisible}
+        onCancel={() => setEditModalVisible(false)}
+        onConfirm={handleEditConfirm}
+      />
     </ScrollView>
   );
 }
@@ -223,7 +235,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 22,
     fontWeight: 'bold',
-    color: '#7B4AE2',
+    color: '#5938A5',
     textAlign: 'center',
     marginVertical: 45,
   },
@@ -245,7 +257,7 @@ const styles = StyleSheet.create({
     textAlignVertical: 'center',
   },
   imageButton: {
-    backgroundColor: '#7B4AE2',
+    backgroundColor: '#5938A5',
     borderRadius: 8,
     paddingVertical: 12,
     alignItems: 'center',
@@ -278,7 +290,7 @@ const styles = StyleSheet.create({
     gap: 16,
   },
   cancelButton: {
-    backgroundColor: '#7B4AE2',
+    backgroundColor: '#5938A5',
     borderRadius: 8,
     flex: 1,
     alignItems: 'center',
@@ -291,7 +303,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   saveButton: {
-    backgroundColor: '#7B4AE2',
+    backgroundColor: '#5938A5',
     borderRadius: 8,
     flex: 1,
     alignItems: 'center',
@@ -350,7 +362,7 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#7B4AE2',
+    color: '#5938A5',
   },
   categoryOption: {
     paddingVertical: 15,
@@ -359,7 +371,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   categoryOptionSelected: {
-    backgroundColor: '#7B4AE2',
+    backgroundColor: '#5938A5',
   },
   categoryOptionText: {
     fontSize: 16,

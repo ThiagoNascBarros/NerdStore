@@ -24,7 +24,7 @@ export default function CardItem({ item }) {
                 key={i}
                 name={i <= rating ? 'star' : 'star-outline'}
                 size={18}
-                color="#7B4AE2"
+                color="#5938A5"
                 style={{ marginRight: 2 }}
               />
             ))}
@@ -41,19 +41,20 @@ export default function CardItem({ item }) {
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#E9DDFB',
+    backgroundColor: '#EADCF8',
+    color: '#000',
     borderRadius: 8,
     padding: 0,
     width: 180,
-    height: 240,
+    height: 270,
     margin: 10,
     alignItems: 'center',
     overflow: 'hidden',
   },
   imageContainer: {
     width: '100%',
-    height: 120,
-    padding: 8,
+    height: 160,
+    paddingBottom: 8 * 2,
     borderRadius: 8,
     backgroundColor: 'transparent',
     justifyContent: 'center',
@@ -62,8 +63,6 @@ const styles = StyleSheet.create({
   image: {
     width: '100%',
     height: '100%',
-    borderTopLeftRadius: 8,
-    borderTopRightRadius: 8,
   },
   infoContainer: {
     flex: 1,
@@ -78,23 +77,22 @@ const styles = StyleSheet.create({
   name: {
     fontWeight: 'bold',
     fontSize: 18,
-    color: '#2D1B4E',
     marginBottom: 2,
   },
   ratingRow: {
     flexDirection: 'row',
     marginBottom: 2,
+    gap: 8,
   },
   category: {
-    color: '#2D1B4E',
     fontSize: 13,
     marginBottom: 0,
   },
   price: {
-    color: '#7B4AE2',
-    fontWeight: 'bold',
-    fontSize: 16,
+    color: '#5938A5',
+    fontSize: 12.5,
     marginBottom: 15,
+    fontWeight: 'bold',
   },
   footer: {
     width: '100%',

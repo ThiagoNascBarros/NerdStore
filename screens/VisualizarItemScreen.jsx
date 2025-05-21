@@ -1,12 +1,38 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, Alert, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useFocusEffect } from '@react-navigation/native';
 import api from '../service/api';
 import DeleteModal from '../components/DeleteModal';
 
 export default function VisualizarItemScreen({ route, navigation }) {
-  const { item } = route.params;
+  const { item: initialItem } = route.params;
+  const [item, setItem] = useState(initialItem);
   const [modalVisible, setModalVisible] = useState(false);
+
+  const loadItem = async () => {
+    try {
+      const response = await api.get(`/item/${initialItem.id}`);
+      const updatedItem = {
+        id: response.data.id,
+        name: response.data.nome,
+        category: response.data.categoria,
+        price: response.data.preco,
+        rating: response.data.classificacao,
+        imageUrl: response.data.imagemUrl,
+        description: response.data.descricao,
+      };
+      setItem(updatedItem);
+    } catch (error) {
+      console.error('Erro ao carregar item:', error);
+    }
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      loadItem();
+    }, [])
+  );
 
   const handleDeleteConfirm = async () => {
     try {
@@ -49,7 +75,7 @@ export default function VisualizarItemScreen({ route, navigation }) {
                     key={i}
                     name={i <= item.rating ? 'star' : 'star-outline'}
                     size={22}
-                    color="#7B4AE2"
+                    color="#5938A5"
                     style={{ marginRight: 16 }}
                   />
                 ))}
@@ -72,7 +98,7 @@ export default function VisualizarItemScreen({ route, navigation }) {
       
       <DeleteModal
         visible={modalVisible}
-        onClose={() => setModalVisible(false)}
+        onCancel={() => setModalVisible(false)}
         onConfirm={handleDeleteConfirm}
       />
     </View>
