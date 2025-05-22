@@ -17,7 +17,11 @@ export default function CardItem({ item }) {
           <Image source={{ uri: imageUrl }} style={styles.image} resizeMode="cover" />
         </View>
         <View style={styles.infoContainer}>
-          <Text style={styles.name}>{name}</Text>
+          <Text 
+            style={styles.name}
+            numberOfLines={1}
+            ellipsizeMode="clip"
+          >{name}</Text>
           <View style={styles.ratingRow}>
             {[1, 2, 3, 4, 5].map((i) => (
               <Ionicons
@@ -73,11 +77,11 @@ const styles = StyleSheet.create({
     paddingTop: 8,
     paddingBottom: 6,
     justifyContent: 'center',
+    flexDirection: 'column',
   },
   name: {
-    fontWeight: 'bold',
-    fontSize: 18,
-    marginBottom: 2,
+      fontSize: 16,
+      fontWeight: 'bold', 
   },
   ratingRow: {
     flexDirection: 'row',

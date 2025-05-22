@@ -7,6 +7,7 @@ import InicialScreen from './screens/InicialScreen';
 import AdicionarItemScreen from './screens/AdicionarItemScreen';
 import VisualizarItemScreen from './screens/VisualizarItemScreen';
 import EditarItemScreen from './screens/EditarItemScreen';
+import 'expo-dev-client';
 
 const Stack = createNativeStackNavigator();
 
