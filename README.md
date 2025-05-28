@@ -68,7 +68,6 @@ O **NerdStore** permite que usuários cadastrem, editem, visualizem e removam it
 
 ![Apresentação](./img/inicial.png)
 ![Itens](./img/Itens.png)
-![Não existe itens](./img/Nenhum%20item%20adicionado.png)
 ![Postar item](./img/Adicionar.png)
 ![Alterar](./img/Alterar.png)
 ![Item](./img/Item.png)
