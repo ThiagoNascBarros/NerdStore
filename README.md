@@ -116,7 +116,7 @@ npx expo start
 ## 📘 Documentação da API
 ### Acesse a documentação Swagger em:
 ```bash
-http://localhost:8080/swagger-ui.html
+https://nerdstore-api.onrender.com/swagger-ui/index.html
 ```
 
 # Prototipamento do App
