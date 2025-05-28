@@ -1,7 +1,10 @@
 # NerdStore API
 
 ## 📋 Descrição
-API REST desenvolvida para gerenciar uma loja de produtos geek (NerdStore), construída com Spring Boot e MongoDB.
+API REST desenvolvida para gerenciar uma coleção de itens geek (NerdStore), construída com Spring Boot e MongoDB.
+
+## Link da API
+[Link API](https://nerdstore-api.onrender.com/item)
 
 ## 🛠️ Tecnologias Utilizadas
 - Java 21
