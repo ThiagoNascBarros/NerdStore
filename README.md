@@ -66,7 +66,14 @@ O **NerdStore** permite que usuários cadastrem, editem, visualizem e removam it
 
 ## 📸 Telas do App
 
-(Inserir aqui os prints das telas: lista, cadastro, edição, etc.)
+![Apresentação](./img/inicial.png)
+![Itens](./img/Itens.png)
+![Não existe itens](./img/Nenhum%20item%20adicionado.png)
+![Postar item](./img/Adicionar.png)
+![Alterar](./img/Alterar.png)
+![Item](./img/Item.png)
+![AlterarModal](./img/AlterarModal.png)
+![ExcluirModal](./img/ExcluirModal.png)
 
 ---
 
