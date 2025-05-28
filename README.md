@@ -119,6 +119,9 @@ npx expo start
 http://localhost:8080/swagger-ui.html
 ```
 
+# Faça o Download do nosso Apk
+<img src="./img/image.png" alt="QRcode" width="350" />
+
 ## 👥 Squad
 - Thiago – Back-end (Java + Spring)
 
