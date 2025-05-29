@@ -127,7 +127,7 @@ https://nerdstore-api.onrender.com/swagger-ui/index.html
 ```
 
 # Prototipamento do App
-[Figma](https://www.figma.com/design/Cf2PmLNHyrTrRrY1gQF0CS/NerdStore?node-id=162-176&t=VdhVbNXiEw0vmBpX-0)
+[![Figma](https://skillicons.dev/icons?i=figma&theme=light&perline=3)](https://www.figma.com/design/Cf2PmLNHyrTrRrY1gQF0CS/NerdStore?node-id=162-176&t=VdhVbNXiEw0vmBpX-0)
 
 # Faça o Download do nosso Apk
 <img src="./img/image.png" alt="QRcode" width="600" />
