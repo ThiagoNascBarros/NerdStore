@@ -66,13 +66,20 @@ O **NerdStore** permite que usuários cadastrem, editem, visualizem e removam it
 
 ## 📸 Telas do App
 
-![Apresentação](./img/inicial.png)
-![Itens](./img/Itens.png)
-![Postar item](./img/Adicionar.png)
-![Alterar](./img/Alterar.png)
-![Item](./img/Item.png)
-![AlterarModal](./img/AlterarModal.png)
-![ExcluirModal](./img/ExcluirModal.png)
+<table align="center">
+    <tr>
+        <td><img src="./img/inicial.png" alt="Apresentação" width="200"/></td>
+        <td><img src="./img/Itens.png" alt="Itens" width="200"/></td>
+        <td><img src="./img/Nenhum%20item%20adicionado.png" alt="Nenhum item adicionado" width="200"/></td>
+        <td><img src="./img/Adicionar.png" alt="Postar item" width="200"/></td>
+    </tr>
+    <tr>
+        <td><img src="./img/Item.png" alt="Item" width="200"/></td>
+        <td><img src="./img/Alterar.png" alt="Alterar" width="200"/></td>
+        <td><img src="./img/AlterarModal.png" alt="AlterarModal" width="200"/></td>
+        <td><img src="./img/ExcluirModal.png" alt="ExcluirModal" width="200"/></td>
+    </tr>
+</table>
 
 ---
 
@@ -116,7 +123,7 @@ npx expo start
 ## 📘 Documentação da API
 ### Acesse a documentação Swagger em:
 ```bash
-http://localhost:8080/swagger-ui.html
+https://nerdstore-api.onrender.com/swagger-ui/index.html
 ```
 
 # Prototipamento do App
