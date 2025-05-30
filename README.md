@@ -21,7 +21,7 @@ O **NerdStore** permite que usuários cadastrem, editem, visualizem e removam it
 
 ### ☕ Back-End
 
-- [Java 17](https://www.oracle.com/java/)
+- [Java 21](https://www.oracle.com/java/)
 - [Spring Boot](https://spring.io/projects/spring-boot)
 - [Spring Data MongoDB](https://spring.io/projects/spring-data-mongodb)
 - [Swagger](https://swagger.io/) – para documentação da API
