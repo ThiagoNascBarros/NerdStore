@@ -25,7 +25,7 @@ O **NerdStore** permite que usuários cadastrem, editem, visualizem e removam it
 - [Spring Boot](https://spring.io/projects/spring-boot)
 - [Spring Data MongoDB](https://spring.io/projects/spring-data-mongodb)
 - [Swagger](https://swagger.io/) – para documentação da API
-- [Cloudinary](https://cloudinary.com/)
+- [Cloudinary](https://cloudinary.com/) - para criação de link's públicos das imagens
 
 ### 🗄️ Banco de Dados
 
